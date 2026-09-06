@@ -395,9 +395,9 @@ const WORDS = [
     id: 4, word: "DHABIHU", dir: "across", row: 4, col: 0, part: 2,
     template: "Mpaka mtu awekapo mguu wake katika uwanja wa ___, ananyimwa kila fadhila na neema.",
     options: ["DHABIHU", "IBADA", "UPENDO"],
-    teachQuote: "Si kiasi cha matoleo ya mtu ndicho kinachohesabika, bali ni kiwango cha kujitolea ambacho matoleo hayo yanahusisha.",
-    teachSource: "Shoghi Effendi, 31 Desemba 1935",
-    teachLink: "https://www.bahai.org/library/authoritative-texts/compilations/bahai-funds-contributions/2"
+    teachQuote: "Mpaka mtu awekapo mguu wake katika uwanja wa dhabihu, ananyimwa kila fadhila na neema; na uwanja huu wa dhabihu ndio ulimwengu wa kufa kwa nafsi, ili mng'ao wa Mungu aliye hai uweze kung'aa.",
+    teachSource: "'Abdu'l-Bahá",
+    teachLink: "https://www.bahai-fund.com/science-of-generosity"
   },
   {
     id: 5, word: "UPENDO", dir: "across", row: 5, col: 3, part: 2,
@@ -539,7 +539,7 @@ function showTeaching(w) {
 }
 
 function showDone() {
-  render(true);
+  render();
 }
 
 function renderGrid() {
@@ -637,23 +637,8 @@ function renderProgress() {
   return html;
 }
 
-function render(showDoneScreen) {
-  if (showDoneScreen || solved.size === WORDS.length) {
-    document.getElementById('app').innerHTML = `
-      <header>
-        <h1>Fumbo la Mfuko</h1>
-        <div class="progress">${renderProgress()}</div>
-      </header>
-      <div class="done-card">
-        <div class="done-title">Tayari kwa Warsha!</div>
-        <div class="done-sub">Mmejibu maswali sita tutakayoyazungumzia leo.
-        Wakati wa hotuba, nitawauliza: "Mnakumbuka swali la ngapi?"</div>
-        <button class="start-btn" style="margin-top:20px" onclick="startGame()">Cheza Tena</button>
-      </div>
-      <footer>Warsha ya Mfuko wa Bahá'í</footer>
-    `;
-    return;
-  }
+function render() {
+  const allDone = solved.size === WORDS.length;
 
   document.getElementById('app').innerHTML = `
     <header>
@@ -662,11 +647,23 @@ function render(showDoneScreen) {
       <div class="progress">${renderProgress()}</div>
     </header>
     <div class="grid-wrap">${renderGrid()}</div>
-    ${renderClueBar()}
-    ${renderWordBank()}
-    ${!selectedId ? '<div class="hint-row">↓ Bonyeza swali kuanza</div>' : ''}
+    ${!allDone ? renderClueBar() : ''}
+    ${!allDone ? renderWordBank() : ''}
+    ${!allDone && !selectedId ? '<div class="hint-row">↓ Bonyeza swali kuanza</div>' : ''}
+    ${allDone ? renderDoneBanner() : ''}
     ${renderCluesList()}
     <footer>Warsha ya Mfuko wa Bahá'í</footer>
+  `;
+}
+
+function renderDoneBanner() {
+  return `
+    <div class="done-card">
+      <div class="done-title">Tayari kwa Warsha!</div>
+      <div class="done-sub">Mmejibu maswali sita tutakayoyazungumzia leo.
+      Wakati wa hotuba, nitawauliza: "Mnakumbuka swali la ngapi?"</div>
+      <button class="start-btn" style="margin-top:20px" onclick="startGame()">Cheza Tena</button>
+    </div>
   `;
 }
 
