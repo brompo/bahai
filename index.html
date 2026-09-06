@@ -2,9 +2,13 @@
 <html lang="sw">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Warsha ya Mfuko wa Bahá'í</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="color-scheme" content="light only">
+<title>Warsha ya Mfuko</title>
 <style>
+  html { color-scheme: light only; background: #F7F6F2; }
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
+
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
@@ -22,99 +26,81 @@
     min-height: 100dvh;
     display: flex;
     flex-direction: column;
-    padding: 24px 20px;
-  }
-
-  header {
-    text-align: center;
-    padding: 20px 0 12px;
+    padding: 40px 24px;
   }
 
   h1 {
-    font-family: Georgia, serif;
-    font-size: 24px;
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 30px;
     font-weight: 700;
+    text-align: center;
   }
 
   .subtitle {
-    font-size: 13px;
+    font-size: 14px;
     color: #9B978C;
-    margin-top: 4px;
+    text-align: center;
+    margin-top: 6px;
+    margin-bottom: 36px;
   }
 
-  .links {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    margin-top: 20px;
-    flex: 1;
-  }
-
-  .link-card {
+  .resource-card {
     display: block;
     background: #fff;
     border: 1px solid #E5E2DA;
-    border-radius: 12px;
-    padding: 16px 18px;
+    border-radius: 14px;
+    padding: 22px 20px;
+    margin-bottom: 16px;
     text-decoration: none;
     color: inherit;
-    transition: border-color 0.15s, transform 0.1s;
+    transition: border-color 0.15s;
   }
 
-  .link-card:active {
-    transform: scale(0.98);
-  }
+  .resource-card:active { border-color: #D4A843; }
 
-  .link-card:hover {
-    border-color: #C8C4B8;
-  }
-
-  .link-title {
-    font-size: 15px;
+  .resource-title {
+    font-family: 'Crimson Pro', Georgia, serif;
+    font-size: 19px;
     font-weight: 700;
     color: #2B2B28;
   }
 
-  .link-desc {
-    font-size: 13px;
+  .resource-desc {
+    font-size: 14px;
     color: #6B6860;
-    margin-top: 3px;
-    line-height: 1.4;
+    line-height: 1.5;
+    margin-top: 8px;
   }
 
-  .placeholder {
-    border-style: dashed;
-    color: #B0AA9C;
+  .coming-soon {
+    border: 1.5px dashed #DDD9D0;
+    border-radius: 14px;
+    padding: 24px 20px;
     text-align: center;
-    font-size: 13px;
-    padding: 20px 18px;
+    color: #B0AA9C;
+    font-size: 14px;
   }
 
   footer {
     text-align: center;
-    padding: 20px 0 4px;
-    font-size: 11px;
+    padding: 30px 0 10px;
+    font-size: 12px;
     color: #C8C4B8;
+    margin-top: auto;
   }
 </style>
 </head>
 <body>
 <div id="app">
-  <header>
-    <h1>Warsha ya Mfuko</h1>
-    <div class="subtitle">Bahá'í Fund Workshop &mdash; Resources</div>
-  </header>
+  <h1>Warsha ya Mfuko</h1>
+  <div class="subtitle">Rasilimali za Warsha ya Mfuko wa Bahá'í</div>
 
-  <div class="links">
-    <a class="link-card" href="fumbo-la-mfuko.html">
-      <div class="link-title">🧩 Fumbo la Mfuko</div>
-      <div class="link-desc">Crossword game teaching Bahá'í Fund principles in Swahili.</div>
-    </a>
+  <a class="resource-card" href="fumbo-la-mfuko-crossword.html">
+    <div class="resource-title">Fumbo la Mfuko</div>
+    <div class="resource-desc">Mchezo wa maneno unaofundisha kanuni za Mfuko wa Bahá'í, kwa Kiswahili.</div>
+  </a>
 
-    <div class="link-card placeholder">
-      More resources coming soon
-    </div>
-  </div>
+  <div class="coming-soon">Rasilimali zaidi zinakuja hivi karibuni</div>
 
   <footer>Warsha ya Mfuko wa Bahá'í</footer>
 </div>
