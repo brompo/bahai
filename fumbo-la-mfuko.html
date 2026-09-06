@@ -213,6 +213,7 @@
 
   .clue-row.active { background: #FFF6E0; }
   .clue-row.solved { background: #E8F3EB; }
+  .clue-row.locked { opacity: 0.4; cursor: default; }
 
   .clue-row-num {
     font-size: 11px;
@@ -476,17 +477,32 @@ function renderStart() {
   `;
 }
 
+function nextUnsolvedId() {
+  const next = WORDS.find(w => !solved.has(w.id));
+  return next ? next.id : null;
+}
+
+function autoSelectNext() {
+  const id = nextUnsolvedId();
+  selectedId = id;
+  if (id && !optionsCache[id]) {
+    const w = WORDS.find(x => x.id === id);
+    optionsCache[id] = shuffle(w.options);
+  }
+}
+
 function startGame() {
   filled = {};
   solved = new Set();
   selectedId = null;
   flashState = {};
   optionsCache = {};
+  autoSelectNext();
   render();
 }
 
 function selectWord(id) {
-  if (solved.has(id)) return;
+  if (id !== nextUnsolvedId()) return;
   selectedId = id;
   if (!optionsCache[id]) {
     const w = WORDS.find(x => x.id === id);
@@ -529,7 +545,7 @@ function showTeaching(w, isReview) {
   const btnLabel = isReview ? 'Funga' : (allDone ? 'Maliza' : 'Endelea');
   const btnAction = isReview
     ? "this.closest('.teach-modal').remove();"
-    : `this.closest('.teach-modal').remove(); ${allDone ? 'showDone()' : ''}`;
+    : "this.closest('.teach-modal').remove(); proceedAfterModal();";
   modal.innerHTML = `
     <div class="teach-card" onclick="event.stopPropagation()">
       <div class="teach-word">${w.word}</div>
@@ -547,36 +563,12 @@ function showTeachingAgain(id) {
   showTeaching(w, true);
 }
 
-function showDone() {
+function proceedAfterModal() {
+  autoSelectNext();
   render();
 }
 
-function handleCellClick(r, c) {
-  const k = `${r},${c}`;
-  const cell = GRID_DATA[k];
-  if (!cell) return;
-
-  const unsolvedIds = cell.wordIds.filter(id => !solved.has(id));
-
-  if (unsolvedIds.length === 0) {
-    // everything at this cell is already solved -- reopen its quote
-    showTeachingAgain(cell.wordIds[0]);
-    return;
-  }
-
-  if (selectedId && unsolvedIds.includes(selectedId) && unsolvedIds.length > 1) {
-    // tapping the shared cell again cycles to the other word crossing here
-    const idx = unsolvedIds.indexOf(selectedId);
-    selectedId = unsolvedIds[(idx + 1) % unsolvedIds.length];
-  } else {
-    selectedId = unsolvedIds[0];
-  }
-
-  if (!optionsCache[selectedId]) {
-    const w = WORDS.find(x => x.id === selectedId);
-    optionsCache[selectedId] = shuffle(w.options);
-  }
-  flashState = {};
+function showDone() {
   render();
 }
 
@@ -593,10 +585,10 @@ function renderGrid() {
       const isSelected = selectedId && getWordCells(WORDS.find(w => w.id === selectedId)).some(wc => wc.row === r && wc.col === c);
       const isDone = cell.wordIds.some(id => solved.has(id));
       const val = filled[k] || '';
-      let cls = 'cell tappable';
+      let cls = 'cell';
       if (isDone) cls += ' done';
       else if (isSelected) cls += ' selected';
-      html += `<div class="${cls}" onclick="handleCellClick(${r},${c})">${cell.number ? `<span class="cell-num">${cell.number}</span>` : ''}${val}</div>`;
+      html += `<div class="${cls}">${cell.number ? `<span class="cell-num">${cell.number}</span>` : ''}${val}</div>`;
     }
   }
   html += `</div>`;
@@ -642,15 +634,19 @@ function renderCluesList() {
 
   function renderSection(title, words) {
     let html = `<div class="clue-section-title">${title}</div>`;
+    const nextId = nextUnsolvedId();
     words.forEach(w => {
       const isSolved = solved.has(w.id);
       const isActive = selectedId === w.id;
+      const isLocked = !isSolved && w.id !== nextId;
       let cls = 'clue-row';
       if (isSolved) cls += ' solved';
       else if (isActive) cls += ' active';
+      else if (isLocked) cls += ' locked';
       const previewText = w.template ? w.template.replace('___', '_____') : w.clue;
+      const clickAction = isSolved ? `showTeachingAgain(${w.id})` : (isLocked ? '' : `selectWord(${w.id})`);
       html += `
-        <div class="${cls}" onclick="${isSolved ? `showTeachingAgain(${w.id})` : `selectWord(${w.id})`}">
+        <div class="${cls}" onclick="${clickAction}">
           <span class="clue-row-num">${w.id}</span>
           <span class="clue-row-text">${previewText}</span>
         </div>
@@ -687,7 +683,7 @@ function render() {
     <div class="grid-wrap">${renderGrid()}</div>
     ${!allDone ? renderClueBar() : ''}
     ${!allDone ? renderWordBank() : ''}
-    ${!allDone && !selectedId ? '<div class="hint-row">↓ Bonyeza namba kwenye jedwali, au swali hapa chini, kuanza</div>' : ''}
+    ${!allDone && !selectedId ? '<div class="hint-row">Bonyeza swali linalofuata kuendelea</div>' : ''}
     ${allDone ? renderDoneBanner() : ''}
     ${renderCluesList()}
     <footer>Warsha ya Mfuko wa Bahá'í</footer>
