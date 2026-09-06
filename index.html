@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="sw">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Warsha ya Mfuko wa Bahá'í</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: #F7F6F2;
+    color: #2B2B28;
+    min-height: 100dvh;
+    display: flex;
+    justify-content: center;
+  }
+
+  #app {
+    max-width: 460px;
+    width: 100%;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    padding: 24px 20px;
+  }
+
+  header {
+    text-align: center;
+    padding: 20px 0 12px;
+  }
+
+  h1 {
+    font-family: Georgia, serif;
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .subtitle {
+    font-size: 13px;
+    color: #9B978C;
+    margin-top: 4px;
+  }
+
+  .links {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 20px;
+    flex: 1;
+  }
+
+  .link-card {
+    display: block;
+    background: #fff;
+    border: 1px solid #E5E2DA;
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: inherit;
+    transition: border-color 0.15s, transform 0.1s;
+  }
+
+  .link-card:active {
+    transform: scale(0.98);
+  }
+
+  .link-card:hover {
+    border-color: #C8C4B8;
+  }
+
+  .link-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #2B2B28;
+  }
+
+  .link-desc {
+    font-size: 13px;
+    color: #6B6860;
+    margin-top: 3px;
+    line-height: 1.4;
+  }
+
+  .placeholder {
+    border-style: dashed;
+    color: #B0AA9C;
+    text-align: center;
+    font-size: 13px;
+    padding: 20px 18px;
+  }
+
+  footer {
+    text-align: center;
+    padding: 20px 0 4px;
+    font-size: 11px;
+    color: #C8C4B8;
+  }
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <h1>Warsha ya Mfuko</h1>
+    <div class="subtitle">Bahá'í Fund Workshop &mdash; Resources</div>
+  </header>
+
+  <div class="links">
+    <a class="link-card" href="fumbo-la-mfuko.html">
+      <div class="link-title">🧩 Fumbo la Mfuko</div>
+      <div class="link-desc">Crossword game teaching Bahá'í Fund principles in Swahili.</div>
+    </a>
+
+    <div class="link-card placeholder">
+      More resources coming soon
+    </div>
+  </div>
+
+  <footer>Warsha ya Mfuko wa Bahá'í</footer>
+</div>
+</body>
+</html>
