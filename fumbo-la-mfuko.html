@@ -521,21 +521,30 @@ function tryWord(word) {
   }
 }
 
-function showTeaching(w) {
+function showTeaching(w, isReview) {
   const modal = document.createElement('div');
   modal.className = 'teach-modal';
   modal.onclick = () => modal.remove();
   const allDone = solved.size === WORDS.length;
+  const btnLabel = isReview ? 'Funga' : (allDone ? 'Maliza' : 'Endelea');
+  const btnAction = isReview
+    ? "this.closest('.teach-modal').remove();"
+    : `this.closest('.teach-modal').remove(); ${allDone ? 'showDone()' : ''}`;
   modal.innerHTML = `
     <div class="teach-card" onclick="event.stopPropagation()">
       <div class="teach-word">${w.word}</div>
       <div class="teach-check">Sahihi! ✓ Swali la ${w.id}</div>
       <div class="teach-quote">"${w.teachQuote}"</div>
       <div class="teach-source">-- ${w.teachSource} &middot; <a href="${w.teachLink}" target="_blank" rel="noopener">chanzo</a></div>
-      <button class="teach-btn" onclick="this.closest('.teach-modal').remove(); ${allDone ? 'showDone()' : ''}">${allDone ? 'Maliza' : 'Endelea'}</button>
+      <button class="teach-btn" onclick="${btnAction}">${btnLabel}</button>
     </div>
   `;
   document.body.appendChild(modal);
+}
+
+function showTeachingAgain(id) {
+  const w = WORDS.find(x => x.id === id);
+  showTeaching(w, true);
 }
 
 function showDone() {
@@ -612,7 +621,7 @@ function renderCluesList() {
       else if (isActive) cls += ' active';
       const previewText = w.template ? w.template.replace('___', '_____') : w.clue;
       html += `
-        <div class="${cls}" onclick="${isSolved ? '' : `selectWord(${w.id})`}">
+        <div class="${cls}" onclick="${isSolved ? `showTeachingAgain(${w.id})` : `selectWord(${w.id})`}">
           <span class="clue-row-num">${w.id}</span>
           <span class="clue-row-text">${previewText}</span>
         </div>
