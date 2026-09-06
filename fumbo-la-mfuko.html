@@ -3,8 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<meta name="color-scheme" content="light only">
 <title>Fumbo la Mfuko - Crossword</title>
 <style>
+  html { color-scheme: light only; background: #F7F6F2; }
   @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@400;600;700&family=Inter:wght@400;500;600;700;800&display=swap');
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -48,10 +50,11 @@
     justify-content: center;
     gap: 5px;
     margin-top: 12px;
+    flex-wrap: wrap;
   }
 
   .pip {
-    width: 24px;
+    width: 22px;
     height: 4px;
     border-radius: 2px;
     background: #DDD9D0;
@@ -63,7 +66,8 @@
   .grid-wrap {
     display: flex;
     justify-content: center;
-    padding: 6px 10px;
+    padding: 8px 10px;
+    overflow-x: auto;
   }
 
   .grid {
@@ -72,15 +76,15 @@
   }
 
   .cell {
-    width: 38px;
-    height: 38px;
+    width: 33px;
+    height: 33px;
     background: #fff;
     border: 1px solid #D0CEC6;
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
-    font-size: 17px;
+    font-size: 14px;
     font-weight: 700;
     color: #CCC;
     transition: background 0.3s, color 0.3s;
@@ -93,42 +97,46 @@
   .cell-num {
     position: absolute;
     top: 1px;
-    left: 3px;
-    font-size: 9px;
+    left: 2px;
+    font-size: 7px;
     font-weight: 600;
     color: #9B978C;
   }
 
   .clue-bar {
     margin: 12px 20px 0;
-    padding: 12px 16px;
+    padding: 14px 16px;
     background: #fff;
     border-radius: 10px;
     border: 1px solid #E5E2DA;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    min-height: 24px;
   }
 
-  .clue-num {
-    font-size: 14px;
+  .swali-tag {
+    display: inline-block;
+    font-size: 11px;
     font-weight: 700;
-    color: #D4A843;
-    min-width: 18px;
-  }
-
-  .clue-dir {
-    font-size: 10px;
-    color: #B0AA9C;
     text-transform: uppercase;
     letter-spacing: 0.06em;
+    color: #fff;
+    background: #D4A843;
+    padding: 3px 10px;
+    border-radius: 12px;
+    margin-bottom: 8px;
   }
 
   .clue-text {
-    font-size: 14px;
-    color: #4A4A45;
-    line-height: 1.4;
+    font-size: 15px;
+    color: #2B2B28;
+    line-height: 1.5;
+    font-weight: 500;
+  }
+
+  .blank {
+    display: inline-block;
+    min-width: 70px;
+    border-bottom: 2px solid #D4A843;
+    color: transparent;
+    font-weight: 700;
   }
 
   .hint-row {
@@ -143,7 +151,7 @@
     display: flex;
     justify-content: center;
     gap: 8px;
-    padding: 12px 16px 6px;
+    padding: 14px 16px 6px;
     flex-wrap: wrap;
   }
 
@@ -151,7 +159,7 @@
     font-family: 'Inter', sans-serif;
     font-size: 14px;
     font-weight: 700;
-    padding: 10px 16px;
+    padding: 12px 18px;
     background: #fff;
     border: 2px solid #C8C4B8;
     border-radius: 20px;
@@ -163,11 +171,10 @@
 
   .word-btn:active { transform: scale(0.95); }
 
-  .word-btn.used {
-    background: #EDEBE4;
-    border-color: #E5E2DA;
-    color: #CCC8BC;
-    cursor: default;
+  .word-btn.correct-flash {
+    background: #E8F3EB;
+    border-color: #4A7C59;
+    color: #2E5E3C;
   }
 
   .word-btn.wrong-flash {
@@ -188,33 +195,45 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
     margin-bottom: 8px;
+    margin-top: 16px;
   }
+
+  .clue-section-title:first-child { margin-top: 0; }
 
   .clue-row {
     display: flex;
-    gap: 8px;
-    padding: 9px 10px;
+    gap: 10px;
+    padding: 10px 10px;
     border-radius: 8px;
     cursor: pointer;
     margin-bottom: 2px;
+    align-items: flex-start;
   }
 
   .clue-row.active { background: #FFF6E0; }
   .clue-row.solved { background: #E8F3EB; }
 
   .clue-row-num {
-    font-size: 13px;
+    font-size: 11px;
     font-weight: 700;
-    color: #D4A843;
-    min-width: 16px;
+    color: #fff;
+    background: #D4A843;
+    min-width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
 
-  .clue-row.solved .clue-row-num { color: #3A7D4F; }
+  .clue-row.solved .clue-row-num { background: #4A7C59; }
 
   .clue-row-text {
     font-size: 13px;
     color: #4A4A45;
     line-height: 1.4;
+    padding-top: 2px;
   }
 
   .clue-row.solved .clue-row-text {
@@ -347,61 +366,59 @@
 <div id="app"></div>
 
 <script>
-// Grid layout: row, col (0-indexed)
-// IBADA    down   col=4 rows 0-4
-// HUDUMA   down   col=7 rows 0-5
-// DHABIHU  across row=1 cols 1-7
-// NEEMA    across row=2 cols 0-4
-// MFUKO    down   col=3 rows 2-6
-// UMOJA    across row=6 cols 1-5
-
 const WORDS = [
   {
-    id: 1, word: "IBADA", dir: "down", row: 0, col: 4,
-    clue: "Kutoa kama sehemu ya maisha yako ya kidini -- kama sala, kama kufunga.",
-    teachQuote: "Kuchangia katika mfuko wa Kibahá'í ni kitendo cha nidhamu ya kiroho ambacho ni kipengele cha msingi katika maisha ya ibada ya mtu binafsi.",
-    teachSource: "Nyumba ya Haki ya Ulimwengu, 17 Septemba 1992",
-    teachLink: "https://bahaitreasurer.us/individual"
-  },
-  {
-    id: 2, word: "HUDUMA", dir: "down", row: 0, col: 7,
-    clue: "Kitu ambacho kila muumini anaweza kutoa, hata kama hawezi kuhutubia hadharani.",
-    teachQuote: "Si waumini wote wanaweza kutoa hotuba za hadhara, si wote wanaitwa kutumikia kwenye taasisi za kiutawala. Lakini wote wanaweza kusali, kupigana vita vyao vya kiroho, na kutoa kwa Mfuko.",
-    teachSource: "Nyumba ya Haki ya Ulimwengu, Wellspring of Guidance",
+    id: 1, word: "WOTE", dir: "across", row: 0, col: 3, part: 1,
+    clue: "Ni watu gani wanabidi kuchangia?",
+    options: ["WOTE", "WACHACHE", "MATAJIRI"],
+    teachQuote: "Wote wanaweza kusali, kupigana vita vyao vya kiroho, na kutoa kwa Mfuko. Kama kila muumini atatekeleza wajibu huu mtakatifu, tutashangazwa na ongezeko la nguvu litakalopatikana kwa mwili mzima.",
+    teachSource: "Nyumba ya Haki ya Ulimwengu, Wellspring of Guidance, uk. 19-20",
     teachLink: "https://bahai-library.com/pdf/s/stewardship_development.pdf"
   },
   {
-    id: 3, word: "DHABIHU", dir: "across", row: 1, col: 1,
-    clue: "Kiwango cha kujitolea ambacho matoleo yanahusisha -- ndicho Mungu anachoangalia, si kiasi.",
-    teachQuote: "Si kiasi cha matoleo ya mtu ndicho kinachohesabika, bali ni kiwango cha kujitolea ambacho matoleo hayo yanahusisha.",
-    teachSource: "Shoghi Effendi, 31 Desemba 1935",
-    teachLink: "https://www.bahai.org/library/authoritative-texts/compilations/bahai-funds-contributions/2"
-  },
-  {
-    id: 4, word: "NEEMA", dir: "across", row: 2, col: 0,
-    clue: "Pendeleo la kuchangia katika maendeleo ya Jambo la Mungu -- hakuna muumini apaswaye kutokujua hili.",
-    teachQuote: "Hakuna muumini anayepaswa kutokuwa na ufahamu juu ya pendeleo la kuchangia katika maendeleo ya Jambo la Mungu, bila kujali hali yake ya kimaisha.",
-    teachSource: "Nyumba ya Haki ya Ulimwengu, 17 Septemba 1992",
-    teachLink: "https://bahaitreasurer.us/individual"
-  },
-  {
-    id: 5, word: "MFUKO", dir: "down", row: 2, col: 3,
-    clue: "Mahali ambapo kutoa ni wajibu wa kiroho ambapo kiasi si muhimu.",
+    id: 2, word: "WAJIBU", dir: "down", row: 0, col: 3, part: 1,
+    template: "Kutoa ni ___ wa Kiroho.",
+    options: ["WAJIBU", "KIPAJI", "CHAGUO"],
     teachQuote: "Kutoa kwa Mfuko ni huduma ambayo kila muumini anaweza kutoa, awe maskini au tajiri; kwani hii ni wajibu wa kiroho ambapo kiasi kinachotolewa si muhimu.",
     teachSource: "Nyumba ya Haki ya Ulimwengu, 18 Desemba 1963",
     teachLink: "https://www.bahai.org/library/authoritative-texts/compilations/bahai-funds-contributions/2"
   },
   {
-    id: 6, word: "UMOJA", dir: "across", row: 6, col: 1,
-    clue: "Nguvu ya kiroho inayotokana na kila mtu kushiriki pamoja, si mtu mmoja peke yake.",
+    id: 3, word: "KIROHO", dir: "across", row: 3, col: 2, part: 1,
+    template: "Nikisali tu na bila kuchangia, maendeleo gani yatakwamishwa? Maendeleo ya ___.",
+    options: ["KIROHO", "KIFEDHA", "KIJAMII"],
+    teachQuote: "Kila Mbahá'í, hata awe maskini kiasi gani, lazima atambue wajibu mzito anaopaswa kuubeba, na anapaswa kuwa na uhakika kwamba maendeleo yake ya kiroho yatategemea sana kiasi ambacho anathibitisha, kwa matendo, utayari wake wa kusaidia taasisi takatifu za Imani Yake.",
+    teachSource: "Shoghi Effendi, barua ya 17 Julai 1937",
+    teachLink: "https://bahai.org/library/authoritative-texts/compilations/bahai-funds-contributions/bahai-funds-contributions.xhtml"
+  },
+  {
+    id: 4, word: "DHABIHU", dir: "across", row: 4, col: 0, part: 2,
+    template: "Mpaka mtu awekapo mguu wake katika uwanja wa ___, ananyimwa kila fadhila na neema.",
+    options: ["DHABIHU", "IBADA", "UPENDO"],
+    teachQuote: "Si kiasi cha matoleo ya mtu ndicho kinachohesabika, bali ni kiwango cha kujitolea ambacho matoleo hayo yanahusisha.",
+    teachSource: "Shoghi Effendi, 31 Desemba 1935",
+    teachLink: "https://www.bahai.org/library/authoritative-texts/compilations/bahai-funds-contributions/2"
+  },
+  {
+    id: 5, word: "UPENDO", dir: "across", row: 5, col: 3, part: 2,
+    template: "Wajibu unasema: 'Lazima nitoe.' ___ unasema: 'Nataka kutoa.'",
+    options: ["UPENDO", "WAJIBU", "HISIA"],
+    teachQuote: "Lazima tuwe kama chemchemi ambayo inaendelea kujimwaga yote iliyo nayo na inaendelea kujazwa tena kutoka chanzo kisichoonekana.",
+    teachSource: "Shoghi Effendi, Directives from the Guardian, uk. 87",
+    teachLink: "https://reference.bahai.org/en/t/se/DG/dg-83.html"
+  },
+  {
+    id: 6, word: "UMOJA", dir: "across", row: 2, col: 0, part: 2,
+    template: "Nguvu ya kiroho hutoka kwenye ___, si kwenye mtu mmoja peke yake.",
+    options: ["UMOJA", "PESA", "KIONGOZI"],
     teachQuote: "Kama kila muumini atatekeleza wajibu huu mtakatifu, tutashangazwa na ongezeko la nguvu litakalopatikana kwa mwili mzima.",
     teachSource: "Nyumba ya Haki ya Ulimwengu, Wellspring of Guidance",
     teachLink: "https://bahai-library.com/pdf/s/stewardship_development.pdf"
   }
 ];
 
-const COLS = 8;
-const ROWS = 7;
+const ROWS = 6;
+const COLS = 9;
 
 function getWordCells(w) {
   return w.word.split('').map((letter, i) => ({
@@ -425,10 +442,11 @@ function buildGridData() {
 }
 
 const GRID_DATA = buildGridData();
-let filled = {};       // "row,col" -> letter
-let solved = new Set(); // word ids solved
+let filled = {};
+let solved = new Set();
 let selectedId = null;
-let wrongFlashId = null;
+let flashState = {};
+let optionsCache = {};
 
 function shuffle(arr) {
   const a = [...arr];
@@ -439,19 +457,18 @@ function shuffle(arr) {
   return a;
 }
 
-let wordBankOrder = shuffle(WORDS.map(w => w.word));
-
 function renderStart() {
   document.getElementById('app').innerHTML = `
     <header>
       <h1>Fumbo la Mfuko</h1>
-      <div class="subtitle">Crossword ya Mfuko wa Bahá'í</div>
+      <div class="subtitle">Maswali ya Warsha yetu ya Mfuko</div>
     </header>
     <div class="start-screen">
       <div class="start-icon">🧩</div>
       <div class="start-desc">
-        Bonyeza swali, kisha chagua neno sahihi kutoka orodha ya maneno.
-        Kila unapopata neno sahihi, utapata fundisho kutoka Maandiko.
+        Kabla ya warsha, jaribu maswali sita kutoka kwenye hotuba yetu ya leo.
+        Kila swali lina majibu matatu -- moja tu ni sahihi. Bonyeza swali,
+        kisha chagua jibu unalofikiri ni sahihi.
       </div>
       <button class="start-btn" onclick="startGame()">Anza</button>
     </div>
@@ -463,14 +480,19 @@ function startGame() {
   filled = {};
   solved = new Set();
   selectedId = null;
-  wrongFlashId = null;
-  wordBankOrder = shuffle(WORDS.map(w => w.word));
+  flashState = {};
+  optionsCache = {};
   render();
 }
 
 function selectWord(id) {
   if (solved.has(id)) return;
   selectedId = id;
+  if (!optionsCache[id]) {
+    const w = WORDS.find(x => x.id === id);
+    optionsCache[id] = shuffle(w.options);
+  }
+  flashState = {};
   render();
 }
 
@@ -478,19 +500,24 @@ function tryWord(word) {
   if (!selectedId) return;
   const w = WORDS.find(x => x.id === selectedId);
   if (word === w.word) {
-    const cells = getWordCells(w);
-    cells.forEach(c => { filled[`${c.row},${c.col}`] = c.letter; });
-    solved.add(w.id);
-    selectedId = null;
-    render();
-    showTeaching(w);
-  } else {
-    wrongFlashId = word;
+    flashState[word] = 'correct';
     render();
     setTimeout(() => {
-      wrongFlashId = null;
+      const cells = getWordCells(w);
+      cells.forEach(c => { filled[`${c.row},${c.col}`] = c.letter; });
+      solved.add(w.id);
+      selectedId = null;
+      flashState = {};
       render();
-    }, 500);
+      showTeaching(w);
+    }, 350);
+  } else {
+    flashState[word] = 'wrong';
+    render();
+    setTimeout(() => {
+      flashState = {};
+      render();
+    }, 600);
   }
 }
 
@@ -502,7 +529,7 @@ function showTeaching(w) {
   modal.innerHTML = `
     <div class="teach-card" onclick="event.stopPropagation()">
       <div class="teach-word">${w.word}</div>
-      <div class="teach-check">Sahihi! ✓</div>
+      <div class="teach-check">Sahihi! ✓ Swali la ${w.id}</div>
       <div class="teach-quote">"${w.teachQuote}"</div>
       <div class="teach-source">-- ${w.teachSource} &middot; <a href="${w.teachLink}" target="_blank" rel="noopener">chanzo</a></div>
       <button class="teach-btn" onclick="this.closest('.teach-modal').remove(); ${allDone ? 'showDone()' : ''}">${allDone ? 'Maliza' : 'Endelea'}</button>
@@ -516,7 +543,7 @@ function showDone() {
 }
 
 function renderGrid() {
-  let html = `<div class="grid" style="grid-template-columns: repeat(${COLS}, 38px); grid-template-rows: repeat(${ROWS}, 38px);">`;
+  let html = `<div class="grid" style="grid-template-columns: repeat(${COLS}, 33px); grid-template-rows: repeat(${ROWS}, 33px);">`;
   for (let r = 0; r < ROWS; r++) {
     for (let c = 0; c < COLS; c++) {
       const k = `${r},${c}`;
@@ -538,39 +565,42 @@ function renderGrid() {
   return html;
 }
 
+function renderClueText(w) {
+  if (w.template) {
+    const parts = w.template.split('___');
+    return `${parts[0]}<span class="blank">&nbsp;&nbsp;&nbsp;&nbsp;</span>${parts[1]}`;
+  }
+  return w.clue;
+}
+
 function renderClueBar() {
   if (!selectedId) return '';
   const w = WORDS.find(x => x.id === selectedId);
   return `
     <div class="clue-bar">
-      <span class="clue-num">${w.id}</span>
-      <div>
-        <div class="clue-dir">${w.dir === 'across' ? 'Mlalo' : 'Wima'}</div>
-        <div class="clue-text">${w.clue}</div>
-      </div>
+      <div class="swali-tag">Swali la ${w.id}</div>
+      <div class="clue-text">${renderClueText(w)}</div>
     </div>
-    <div class="hint-row">Chagua neno sahihi hapa chini</div>
   `;
 }
 
 function renderWordBank() {
   if (!selectedId) return '';
+  const opts = optionsCache[selectedId] || [];
   let html = '<div class="word-bank">';
-  wordBankOrder.forEach(word => {
-    const wordObj = WORDS.find(w => w.word === word);
-    const isUsed = solved.has(wordObj.id);
+  opts.forEach(word => {
     let cls = 'word-btn';
-    if (isUsed) cls += ' used';
-    if (wrongFlashId === word) cls += ' wrong-flash';
-    html += `<button class="${cls}" ${isUsed ? 'disabled' : `onclick="tryWord('${word}')"`}>${word}</button>`;
+    if (flashState[word] === 'correct') cls += ' correct-flash';
+    if (flashState[word] === 'wrong') cls += ' wrong-flash';
+    html += `<button class="${cls}" onclick="tryWord('${word}')">${word}</button>`;
   });
   html += '</div>';
   return html;
 }
 
 function renderCluesList() {
-  const across = WORDS.filter(w => w.dir === 'across');
-  const down = WORDS.filter(w => w.dir === 'down');
+  const part1 = WORDS.filter(w => w.part === 1);
+  const part2 = WORDS.filter(w => w.part === 2);
 
   function renderSection(title, words) {
     let html = `<div class="clue-section-title">${title}</div>`;
@@ -580,10 +610,11 @@ function renderCluesList() {
       let cls = 'clue-row';
       if (isSolved) cls += ' solved';
       else if (isActive) cls += ' active';
+      const previewText = w.template ? w.template.replace('___', '_____') : w.clue;
       html += `
         <div class="${cls}" onclick="${isSolved ? '' : `selectWord(${w.id})`}">
           <span class="clue-row-num">${w.id}</span>
-          <span class="clue-row-text">${w.clue}</span>
+          <span class="clue-row-text">${previewText}</span>
         </div>
       `;
     });
@@ -592,9 +623,8 @@ function renderCluesList() {
 
   return `
     <div class="clues-list">
-      ${renderSection('Mlalo (Across)', across)}
-      <div style="height:14px"></div>
-      ${renderSection('Wima (Down)', down)}
+      ${renderSection('Sehemu ya 1: Nani na Kwa Nini', part1)}
+      ${renderSection('Sehemu ya 2: Roho ya Kuchangia', part2)}
     </div>
   `;
 }
@@ -615,8 +645,9 @@ function render(showDoneScreen) {
         <div class="progress">${renderProgress()}</div>
       </header>
       <div class="done-card">
-        <div class="done-title">Hongera! Umekamilisha!</div>
-        <div class="done-sub">Ibada. Huduma. Dhabihu. Neema. Mfuko. Umoja.<br>Haya ndiyo mafundisho ya Mfuko tutakayozungumza katika warsha.</div>
+        <div class="done-title">Tayari kwa Warsha!</div>
+        <div class="done-sub">Mmejibu maswali sita tutakayoyazungumzia leo.
+        Wakati wa hotuba, nitawauliza: "Mnakumbuka swali la ngapi?"</div>
         <button class="start-btn" style="margin-top:20px" onclick="startGame()">Cheza Tena</button>
       </div>
       <footer>Warsha ya Mfuko wa Bahá'í</footer>
@@ -627,7 +658,7 @@ function render(showDoneScreen) {
   document.getElementById('app').innerHTML = `
     <header>
       <h1>Fumbo la Mfuko</h1>
-      <div class="subtitle">Crossword ya Mfuko wa Bahá'í</div>
+      <div class="subtitle">Maswali ya Warsha yetu ya Mfuko</div>
       <div class="progress">${renderProgress()}</div>
     </header>
     <div class="grid-wrap">${renderGrid()}</div>
