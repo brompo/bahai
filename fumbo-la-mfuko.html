@@ -142,10 +142,18 @@
 
   .hint-row {
     text-align: center;
-    font-size: 11px;
-    color: #B0AA9C;
-    margin-top: 8px;
+    margin-top: 10px;
     padding: 0 20px;
+  }
+
+  .hint-badge {
+    display: inline-block;
+    background: #C0392B;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 20px;
   }
 
   .word-bank {
@@ -467,9 +475,9 @@ function renderStart() {
     </header>
     <div class="start-screen">
       <div class="start-desc">
-        Kabla ya warsha, jaribu maswali sita kutoka kwenye hotuba yetu ya leo.
-        Kila swali lina majibu matatu -- moja tu ni sahihi. Bonyeza swali,
-        kisha chagua jibu unalofikiri ni sahihi.
+        Kabla ya warsha, jaribu maswali sita kutoka kwenye hotuba yetu ya leo,
+        kwa mpangilio kutoka la kwanza hadi la sita. Kila swali lina majibu
+        matatu -- moja tu ni sahihi.
       </div>
       <button class="start-btn" onclick="startGame()">Anza</button>
     </div>
@@ -497,7 +505,6 @@ function startGame() {
   selectedId = null;
   flashState = {};
   optionsCache = {};
-  autoSelectNext();
   render();
 }
 
@@ -564,7 +571,6 @@ function showTeachingAgain(id) {
 }
 
 function proceedAfterModal() {
-  autoSelectNext();
   render();
 }
 
@@ -663,6 +669,13 @@ function renderCluesList() {
   `;
 }
 
+function renderHint() {
+  const text = solved.size === 0
+    ? 'Bonyeza swali hapa chini kuanza'
+    : 'Bonyeza swali linalofuata kuendelea';
+  return `<div class="hint-row"><span class="hint-badge">${text}</span></div>`;
+}
+
 function renderProgress() {
   let html = '';
   WORDS.forEach(w => {
@@ -683,7 +696,7 @@ function render() {
     <div class="grid-wrap">${renderGrid()}</div>
     ${!allDone ? renderClueBar() : ''}
     ${!allDone ? renderWordBank() : ''}
-    ${!allDone && !selectedId ? '<div class="hint-row">Bonyeza swali linalofuata kuendelea</div>' : ''}
+    ${!allDone && !selectedId ? renderHint() : ''}
     ${allDone ? renderDoneBanner() : ''}
     ${renderCluesList()}
     <footer>Warsha ya Mfuko wa Bahá'í</footer>
