@@ -91,6 +91,7 @@
   }
 
   .cell.empty { background: transparent; border: none; }
+  .cell.tappable { cursor: pointer; }
   .cell.selected { background: #FFF6E0; }
   .cell.done { background: #E8F3EB; color: #3A7D4F; }
 
@@ -371,17 +372,17 @@ const WORDS = [
     id: 1, word: "WOTE", dir: "across", row: 0, col: 3, part: 1,
     clue: "Ni watu gani wanabidi kuchangia?",
     options: ["WOTE", "WACHACHE", "MATAJIRI"],
-    teachQuote: "Wote wanaweza kusali, kupigana vita vyao vya kiroho, na kutoa kwa Mfuko. Kama kila muumini atatekeleza wajibu huu mtakatifu, tutashangazwa na ongezeko la nguvu litakalopatikana kwa mwili mzima.",
-    teachSource: "Nyumba ya Haki ya Ulimwengu, Wellspring of Guidance, uk. 19-20",
-    teachLink: "https://bahai-library.com/pdf/s/stewardship_development.pdf"
+    teachQuote: "Kutoa kwa Mfuko ni huduma ambayo kila muumini anaweza kutoa, awe maskini au tajiri; kwani hii ni wajibu wa kiroho ambapo kiasi kinachotolewa si muhimu.",
+    teachSource: "Nyumba ya Haki ya Ulimwengu, 18 Desemba 1963",
+    teachLink: "https://www.bahai.org/library/authoritative-texts/compilations/bahai-funds-contributions/2"
   },
   {
     id: 2, word: "WAJIBU", dir: "down", row: 0, col: 3, part: 1,
     template: "Kutoa ni ___ wa Kiroho.",
     options: ["WAJIBU", "KIPAJI", "CHAGUO"],
-    teachQuote: "Kutoa kwa Mfuko ni huduma ambayo kila muumini anaweza kutoa, awe maskini au tajiri; kwani hii ni wajibu wa kiroho ambapo kiasi kinachotolewa si muhimu.",
-    teachSource: "Nyumba ya Haki ya Ulimwengu, 18 Desemba 1963",
-    teachLink: "https://www.bahai.org/library/authoritative-texts/compilations/bahai-funds-contributions/2"
+    teachQuote: "Kutoa na kuwa mkarimu ni sifa Zangu; heri kwake yeye ajivikaye sifa Zangu.",
+    teachSource: "Bahá'u'lláh, Maneno Yaliyofichika, Kiajemi, na. 49",
+    teachLink: "https://www.bahai.org/library/authoritative-texts/bahaullah/hidden-words/1"
   },
   {
     id: 3, word: "KIROHO", dir: "across", row: 3, col: 2, part: 1,
@@ -551,6 +552,35 @@ function showDone() {
   render();
 }
 
+function handleCellClick(r, c) {
+  const k = `${r},${c}`;
+  const cell = GRID_DATA[k];
+  if (!cell) return;
+
+  const unsolvedIds = cell.wordIds.filter(id => !solved.has(id));
+
+  if (unsolvedIds.length === 0) {
+    // everything at this cell is already solved -- reopen its quote
+    showTeachingAgain(cell.wordIds[0]);
+    return;
+  }
+
+  if (selectedId && unsolvedIds.includes(selectedId) && unsolvedIds.length > 1) {
+    // tapping the shared cell again cycles to the other word crossing here
+    const idx = unsolvedIds.indexOf(selectedId);
+    selectedId = unsolvedIds[(idx + 1) % unsolvedIds.length];
+  } else {
+    selectedId = unsolvedIds[0];
+  }
+
+  if (!optionsCache[selectedId]) {
+    const w = WORDS.find(x => x.id === selectedId);
+    optionsCache[selectedId] = shuffle(w.options);
+  }
+  flashState = {};
+  render();
+}
+
 function renderGrid() {
   let html = `<div class="grid" style="grid-template-columns: repeat(${COLS}, 33px); grid-template-rows: repeat(${ROWS}, 33px);">`;
   for (let r = 0; r < ROWS; r++) {
@@ -564,10 +594,10 @@ function renderGrid() {
       const isSelected = selectedId && getWordCells(WORDS.find(w => w.id === selectedId)).some(wc => wc.row === r && wc.col === c);
       const isDone = cell.wordIds.some(id => solved.has(id));
       const val = filled[k] || '';
-      let cls = 'cell';
+      let cls = 'cell tappable';
       if (isDone) cls += ' done';
       else if (isSelected) cls += ' selected';
-      html += `<div class="${cls}">${cell.number ? `<span class="cell-num">${cell.number}</span>` : ''}${val}</div>`;
+      html += `<div class="${cls}" onclick="handleCellClick(${r},${c})">${cell.number ? `<span class="cell-num">${cell.number}</span>` : ''}${val}</div>`;
     }
   }
   html += `</div>`;
@@ -658,7 +688,7 @@ function render() {
     <div class="grid-wrap">${renderGrid()}</div>
     ${!allDone ? renderClueBar() : ''}
     ${!allDone ? renderWordBank() : ''}
-    ${!allDone && !selectedId ? '<div class="hint-row">↓ Bonyeza swali kuanza</div>' : ''}
+    ${!allDone && !selectedId ? '<div class="hint-row">↓ Bonyeza namba kwenye jedwali, au swali hapa chini, kuanza</div>' : ''}
     ${allDone ? renderDoneBanner() : ''}
     ${renderCluesList()}
     <footer>Warsha ya Mfuko wa Bahá'í</footer>
